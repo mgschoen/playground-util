@@ -1,0 +1,76 @@
+#!/bin/bash
+
+playgroundsBasePath="$HOME/code/_playgrounds"
+playgroundName=$1
+playgroundPath="$playgroundsBasePath/$playgroundName"
+
+if [ -z $playgroundName ] ; then
+    echo "Usage:
+    play <name> - creates a new playground with the specified name or launches an existing one
+    play ls     - lists all existing playgrounds
+    "
+    exit
+fi
+
+# ls command
+if [ $playgroundName = "ls" ] ; then
+    echo ""
+    ls -1A "$playgroundsBasePath"
+    echo ""
+    exit
+fi
+
+echo ""
+echo "- Setting up playground \"$playgroundName\" -"
+
+# create directory
+if [ -d "$playgroundPath" ]; then
+    echo "Playground exists"
+else 
+    echo "Creating directory ..."
+    mkdir $playgroundPath
+    if [ $? -ne 0 ] ; then
+        echo "Failed to create playground directory. Exiting."
+        exit
+    fi
+fi
+
+# create index.html
+entryFilePath="$playgroundPath/index.html"
+if [ -f "$entryFilePath" ]; then
+    echo "Entry file exists"
+else 
+    echo "Creating entry file ..."
+    touch $entryFilePath
+    if [ $? -ne 0 ] ; then
+        echo "Failed to create entry file. Exiting."
+        exit
+    fi
+    echo "Writing to entry file ..."
+    cat > $entryFilePath <<EOF
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <title>$playgroundName</title>
+</head>
+<body>
+    <h1>Hey, $playgroundName!</h1>
+
+</body>
+</html>
+EOF
+fi
+
+# navigate into directory
+echo ""
+echo "- Launching playground -"
+cd $playgroundPath
+
+# Open VS Code
+echo "Launching VS Code ..."
+code .
+
+# Launch http-server
+echo "Starting server ..."
+http-server . -o
