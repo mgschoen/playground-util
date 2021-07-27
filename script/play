@@ -2,6 +2,7 @@
 
 playgroundsBasePath="$HOME/code/_playgrounds"
 playgroundName=$1
+flag=$2
 playgroundPath="$playgroundsBasePath/$playgroundName"
 
 if [ -z $playgroundName ] ; then
@@ -35,19 +36,21 @@ else
     fi
 fi
 
-# create index.html
-entryFilePath="$playgroundPath/index.html"
-if [ -f "$entryFilePath" ]; then
-    echo "Entry file exists"
-else 
-    echo "Creating entry file ..."
-    touch $entryFilePath
-    if [ $? -ne 0 ] ; then
-        echo "Failed to create entry file. Exiting."
-        exit
-    fi
-    echo "Writing to entry file ..."
-    cat > $entryFilePath <<EOF
+# plain index.html with http-server
+if [ -z $flag ]; then
+    # create index.html
+    entryFilePath="$playgroundPath/index.html"
+    if [ -f "$entryFilePath" ]; then
+        echo "Entry file exists"
+    else 
+        echo "Creating entry file ..."
+        touch $entryFilePath
+        if [ $? -ne 0 ] ; then
+            echo "Failed to create entry file. Exiting."
+            exit
+        fi
+        echo "Writing to entry file ..."
+        cat > $entryFilePath <<EOF
 <!DOCTYPE html>
 <html>
 <head>
@@ -60,17 +63,72 @@ else
 </body>
 </html>
 EOF
+    fi
+
+    # navigate into directory
+    echo ""
+    echo "- Launching playground -"
+    cd $playgroundPath
+
+    # Open VS Code
+    echo "Launching VS Code ..."
+    code .
+
+    # Launch http-server
+    echo "Starting server ..."
+    http-server . -o
+
+# webpack boilerplate
+elif [ $flag = "--webpack" ]; then
+    cd $playgroundPath
+
+    # fetch repo contents
+    webpackConfigPath="$playgroundPath/webpack.config.js"
+    if [ -f "$webpackConfigPath" ]; then
+        echo "Webpack template already set up"
+    else
+        echo "Fetching webpack template repo..."
+        npx degit https://github.com/mgschoen/playground-template-webpack.git
+    fi
+
+    # create config.json
+    configFilePath="$playgroundPath/config.json"
+    if [ -f "$configFilePath" ]; then
+        echo "Config file exists"
+    else
+        echo "Creating config file ..."
+        touch $configFilePath
+        if [ $? -ne 0 ] ; then
+            echo "Failed to create config file. Exiting."
+            exit
+        fi
+        echo "Writing to config file ..."
+        cat > $configFilePath <<EOF
+{
+    "siteName": "$playgroundName"
+}
+EOF
+    fi
+
+    # install dependencies
+    nodeModulesDir="$playgroundPath/node_modules/"
+    if [ -d "$nodeModulesDir" ]; then
+        echo "Dependencies already installed"
+    else
+        echo "Installing dependencies..."
+        npm install
+    fi
+
+    echo ""
+    echo "- Launching playground -"
+
+    # Open VS Code
+    echo "Launching VS Code ..."
+    code .
+
+    # Start Dev Server
+    echo "Starting server..."
+    npm run dev
+else
+    echo "Unknown option \"$flag\". Aborting."
 fi
-
-# navigate into directory
-echo ""
-echo "- Launching playground -"
-cd $playgroundPath
-
-# Open VS Code
-echo "Launching VS Code ..."
-code .
-
-# Launch http-server
-echo "Starting server ..."
-http-server . -o
