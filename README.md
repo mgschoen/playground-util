@@ -1,6 +1,11 @@
 # playground-util
 
-This is a script for setting up a super-quick local playground for frontend development. Once installed, you can hit `play <playground-name>` in your Terminal and it will bootstrap a ready-to-code barebones HTML project, fire up a dev server, open the page in the browser and the project in VS Code.
+This is a script for setting up a super-quick local playground for frontend development. You can choose between:
+
+- a barebones HTML project
+- a simple Webpack setup that will allow you to install and import npm dependencies out of the box.
+
+Once installed, you can hit `play <playground-name>` in your Terminal and the util will bootstrap the project if necessary, fire up a dev server, open the page in the browser and the project in VS Code.
 
 ## Requirements
 
@@ -37,6 +42,12 @@ $ play playground-name
 will create a directory called "playground-name" inside the `~/code/_playgrounds/` directory, create the index.html, fire up a http-server, open the page in your browser and open the directory in VS Code.
 
 If a directory `~/code/_playgrounds/playground-nanme/` already exists, it will open the existing one instead.
+
+``` shell
+$ play playground-bundled --webpack
+```
+
+will setup a copy of [playground-template-webpack](https://github.com/mgschoen/playground-template-webpack). For all subsequent boots of this project, calling `play playground-bundled` will be sufficient. The util will auto-detect that this is a webpack project.
 
 ``` shell
 $ play ls
