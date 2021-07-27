@@ -36,6 +36,11 @@ else
     fi
 fi
 
+cd $playgroundPath
+if [ -f "$playgroundPath/webpack.config.js" ]; then
+    flag="--webpack"
+fi
+
 # plain index.html with http-server
 if [ -z $flag ]; then
     # create index.html
@@ -68,7 +73,6 @@ EOF
     # navigate into directory
     echo ""
     echo "- Launching playground -"
-    cd $playgroundPath
 
     # Open VS Code
     echo "Launching VS Code ..."
